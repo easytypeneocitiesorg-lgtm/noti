@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Announcement Admin (Firebase)</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #admin-panel { display: none; margin-top: 20px; }
+    #announcement { margin-top: 20px; font-weight: bold; color: darkblue; }
+  </style>
+</head>
+<body>
+  <h1>Announcement Admin</h1>
+
+  <div id="admin-panel">
+    <input type="text" id="announcement-input" placeholder="Enter announcement text" />
+    <button id="apply-btn">Apply</button>
+    <div id="announcement"></div>
+  </div>
+
+  <script>
+    // --- Your Firebase config ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDPmFlt2c31NB9UeL_MU1l47UkSO8Qnguo",
+      authDomain: "noti-83398.firebaseapp.com",
+      projectId: "noti-83398",
+      storageBucket: "noti-83398.firebasestorage.app",
+      messagingSenderId: "1082986488596",
+      appId: "1:1082986488596:web:7bfcfcbf471539eb21d801",
+      measurementId: "G-ZJ5QB536D9"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Prompt for admin key
+    window.addEventListener('DOMContentLoaded', async () => {
+      const key = prompt("Enter admin key:");
+      if (key === "%$#@!") {
+        document.getElementById('admin-panel').style.display = 'block';
+
+        // Load current announcement from Firestore
+        const doc = await db.collection("config").doc("announcement").get();
+        if (doc.exists) {
+          document.getElementById('announcement').textContent =
+            "Current Announcement: " + doc.data().text;
+        }
+      } else {
+        alert("Invalid key. Access denied.");
+      }
+    });
+
+    // Apply button logic
+    document.getElementById('apply-btn').addEventListener('click', async () => {
+      const text = document.getElementById('announcement-input').value.trim();
+      if (text.length === 0) {
+        alert("Please enter some text.");
+        return;
+      }
+      await db.collection("config").doc("announcement").set({ text });
+      document.getElementById('announcement').textContent = "Current Announcement: " + text;
+      alert("Announcement updated!");
+    });
+  </script>
+</body>
+</html>
